@@ -15,15 +15,15 @@ class SqlAlchemyRepository(AbstractRepository, Generic[ModelType, CreateSchemaTy
         self.model = model
     
     async def create(self, data: CreateSchemaType) -> ModelType:
-        async with self._session_factory as session:
+        async with self._session_factory() as session:
             instance = self.model(**data)
             session.add(instance)
             await session.commit()
             await session.refresh(instance)
-            return instance
+            return instance 
         
     async def update(self, data: UpdateSchemaType, **filters) -> ModelType:
-        async with self._session_factory as session:
+        async with self._session_factory() as session:
             stmt = update(self.model).values(**data).filter_by(**filters).returning(self.model)
             res = await session.execute(stmt)
             await session.commit()
@@ -35,12 +35,12 @@ class SqlAlchemyRepository(AbstractRepository, Generic[ModelType, CreateSchemaTy
             await session.commit()
 
     async def get_single(self, **filters) -> Optional[ModelType] | None:
-        async with self._session_factory as session:
+        async with self._session_factory() as session:
             row = await session.execute(select(self.model).filter_by(**filters))
             return row.scalar_one_or_none()
         
     async def get_multi(self, order: str = "id", limit: int = 100, offset: int = 0) -> Optional[list[ModelType]] | None:
-        async with self._session_factory as session:
+        async with self._session_factory() as session:
             stmt = select(self.model).order_by(order).limit(limit).offset(offset)
             row = await session.execute(stmt)
             return row.scalars().all() # type: ignore

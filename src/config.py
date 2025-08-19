@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_PWD: str
     DB_USER: str
+    SECKRET_KEY: str
+    ALGORITHM: str
 
     @property
     def DATABASE_URL(self) ->Optional[PostgresDsn]:
