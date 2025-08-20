@@ -1,14 +1,22 @@
+from typing import Union
 from repositories.sqlalchemy_repository import ModelType
-from schemas.order_shema import SOrderCreate
+from schemas.order_shema import SOrderCreate, SOrderUpdateComplete, SOrderUpdate, SOrderTake
 from .base_service import BaseServise
+from models.user_model import User, Role
 from repositories.order_repository import order_repository
+from exeptions.exeptions import BadRUserRole
 
 class OrderServise(BaseServise):
-    async def create(self, model: SOrderCreate, cust_id) -> ModelType:
-        order_data = model.model_dump()
-        order_data["customer_id"] = cust_id
-        return await self.repository.create(data =order_data)
-    
+    async def create(self, model: SOrderCreate, user: User) -> ModelType:
+        try:
+            if user.role != Role.CUSTOMER:
+                raise BadRUserRole
+            order_data = model.model_dump()
+            order_data["customer_id"] = user.id
+            return await self.repository.create(data =order_data)
+        except BadRUserRole:
+            raise 
+
     async def my_orders(self, pk: int, role: str):
         if role == "customer":
             return await self.repository.get_all_by_filter(customer_id=pk)
@@ -17,5 +25,20 @@ class OrderServise(BaseServise):
         else:
             return []
         
+    async def complete_order(self, pk: int, role: str, model: Union[SOrderUpdateComplete, SOrderUpdate]) -> ModelType:
+        try:
+            if role != Role.CUSTOMER:
+                    raise BadRUserRole
+            return await self.repository.update(data = model.model_dump(), id = pk)
+        except BadRUserRole:
+            raise 
+
+    async def take_order(self, pk: int, role: str, model: Union[SOrderTake, SOrderUpdate]) -> ModelType:
+        try:
+            if role != Role.COURIER:
+                    raise BadRUserRole
+            return await self.repository.update(data = model.model_dump(), id = pk)
+        except BadRUserRole:
+            raise 
 
 order_service = OrderServise(repository=order_repository)

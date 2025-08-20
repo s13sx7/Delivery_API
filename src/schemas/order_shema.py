@@ -14,11 +14,15 @@ class SOrderCreate(BaseModel):
             raise ValueError("Bad list")
             
         return v
-        
-
-
-
 
 class SOrderUpdate(SOrderCreate):
-    ...
+    id:int
+    comlete: bool = True
 
+class SOrderUpdateComplete(BaseModel):
+    id:int
+    complete: bool = True
+
+class SOrderTake(BaseModel):
+    id: int
+    courier_id: int

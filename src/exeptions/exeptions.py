@@ -36,3 +36,7 @@ class InvalidTokenError(APIError):
 class BadProductListError(APIError):
     def __init__(self, status_code: int = status.HTTP_400_BAD_REQUEST, detail: str = "Bad Product list") -> None:
         super().__init__(status_code, detail)
+
+class BadRUserRole(APIError):
+    def __init__(self, status_code: int = status.HTTP_400_BAD_REQUEST, detail: str = "Bad user role") -> None:
+        super().__init__(status_code, detail)
