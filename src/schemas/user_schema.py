@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from models.user_model import Role
 
 class SUserCreate(BaseModel):
     name: str
@@ -13,3 +14,8 @@ class SUserAuth(BaseModel):
     password: str
 
 
+class SUserCourierUpdate(BaseModel):
+    role: Role = Role.COURIER
+
+class SUserCustomerUpdate(BaseModel):
+   role: Role = Role.CUSTOMER

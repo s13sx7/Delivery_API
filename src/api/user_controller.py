@@ -1,10 +1,11 @@
 from datetime import timedelta
 from fastapi import APIRouter, Response, Depends
 from services.user_service import user_service
-from schemas.user_schema import SUserAuth, SUserCreate
+from schemas.user_schema import SUserAuth, SUserCreate, SUserCourierUpdate, SUserCustomerUpdate
 from auth.security import create_access_token
 from exeptions.exeptions import InvalidPasswordError
 from api.dependencies import get_current_user
+from models.user_model import User, Role
 router = APIRouter(prefix="/user", tags=["user"])
 
 @router.post("/login")
@@ -34,3 +35,12 @@ async def create_new_user(data: SUserCreate):
 @router.get("/me")
 async def get_me(user = Depends(get_current_user)):
     return await user_service.get(email=user.email)
+
+@router.patch("/make_me_courier")
+async def make_me_courier(data: SUserCourierUpdate, user: User = Depends(get_current_user)):
+ 
+    return await user_service.update(user.id, data)
+@router.patch("/make_me_customer")
+async def make_me_customer(data: SUserCustomerUpdate, user: User = Depends(get_current_user)):
+    return await user_service.update(user.id, data)
+

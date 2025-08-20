@@ -4,7 +4,6 @@ from models.user_model import User
 from database import db_helper
 from schemas.user_schema import SUserCreate, SUserUpdate
 from sqlalchemy import select
-from auth.security import get_hashed_password
 
 
 class UserRepository(SqlAlchemyRepository[ModelType, SUserCreate, SUserUpdate]):
