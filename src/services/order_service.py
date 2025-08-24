@@ -25,20 +25,10 @@ class OrderServise(BaseServise):
         else:
             return []
         
-    async def complete_order(self, pk: int, role: str, model: Union[SOrderUpdateComplete, SOrderUpdate]) -> ModelType:
-        try:
-            if role != Role.CUSTOMER:
-                    raise BadRUserRole
-            return await self.repository.update(data = model.model_dump(), id = pk)
-        except BadRUserRole:
-            raise 
+    async def complete_order(self, pk: int, model: Union[SOrderUpdateComplete, SOrderUpdate]) -> ModelType:
+        return await self.repository.update(data = model.model_dump(), id = pk)
 
-    async def take_order(self, pk: int, role: str, model: Union[SOrderTake, SOrderUpdate]) -> ModelType:
-        try:
-            if role != Role.COURIER:
-                    raise BadRUserRole
-            return await self.repository.update(data = model.model_dump(), id = pk)
-        except BadRUserRole:
-            raise 
+    async def take_order(self, pk: int, model: Union[SOrderTake, SOrderUpdate]) -> ModelType:
+        return await self.repository.update(data = model.model_dump(), id = pk)
 
 order_service = OrderServise(repository=order_repository)

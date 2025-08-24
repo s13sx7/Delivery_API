@@ -12,8 +12,8 @@ class User(Base):
     
     name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     email: Mapped[EmailStr] = mapped_column(String(255), nullable=False, unique=True)
-    role: Mapped[Role] = mapped_column(SqlEnum(Role), default=Role.CUSTOMER)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[Role] = mapped_column(SqlEnum(Role), nullable=False, default=Role.CUSTOMER)
     
     customer_orders: Mapped[list["Order"]] = relationship(
         "Order", 

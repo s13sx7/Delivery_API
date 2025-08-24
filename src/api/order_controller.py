@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from services.order_service import order_service
 from api.dependencies import get_current_user
-from models.user_model import User
+from models.user_model import User, Role
 from schemas.order_shema import SOrderCreate, SOrderTake, SOrderUpdateComplete
-from exeptions.exeptions import BadProductListError
+from exeptions.exeptions import BadProductListError, BadRUserRole
 
 router = APIRouter(prefix="/order", tags=["order"])
 
@@ -20,9 +20,20 @@ async def my_orders(user: User = Depends(get_current_user)):
 
 @router.patch("/complite_order")
 async def complite_order(data: SOrderUpdateComplete, user: User = Depends(get_current_user)):
-    return await order_service.complete_order(data.id, user.role, model=data)
+    try:
+        if user.role != Role.CUSTOMER:
+            raise BadRUserRole
+        data.id = user.id
+        return await order_service.complete_order(data.id, model=data)
+    except BadRUserRole:
+        raise
 
 @router.patch("/take_order")
 async def take_order(data: SOrderTake, user: User = Depends(get_current_user)):
-    data.courier_id = user.id
-    return await order_service.take_order(data.id, user.role, model=data)
+    try:
+        if user.role != Role.COURIER:
+            raise BadRUserRole
+        data.courier_id = user.id
+        return await order_service.take_order(data.id, model=data)
+    except BadRUserRole:
+        raise
